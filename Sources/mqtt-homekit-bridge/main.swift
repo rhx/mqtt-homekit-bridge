@@ -8,13 +8,14 @@ let cmd = args[0]                   ///< command name
 var name = convert(cmd, using: basename)
 var verbosity = 1                   ///< verbosity level
 var port = 1883                     ///< MQTT port
-var host = "192.168.1.243"          ///< Controller host
+var host = "192.168.1.3"            ///< Controller host
 var pin = "123-45-678"
 var vendor = "Space Age Technologies"
 var type = "SC3D-UD"
 var serial = "0c:82:68:d3:4c:3c"
 var version = "1.0.0"
 var configuration = "/usr/local/etc/\(name).conf"
+var active = true
 
 fileprivate func usage() -> Never {
     print("Usage: \(cmd) <options>")
@@ -124,3 +125,16 @@ let (accessories, accessoryIndexes) = devices.enumerated().reduce(([Accessory]()
     }
     return ($0.0 + [accessory], $0.1 + [index])
 }
+let info = Service.Info(name: name, manufacturer: vendor, model: type, serialNumber: serial, firmwareRevision: version)
+let device = Device(bridgeInfo: info, setupCode: pin, storage: db, accessories: accessories)
+
+let server = try Server(device: device, port: 0)
+server.start()
+
+try! mosquitto.loopStart()
+
+while active {
+    RunLoop.current.run(until: Date().addingTimeInterval(2))
+}
+
+try! mosquitto.loopStop()
