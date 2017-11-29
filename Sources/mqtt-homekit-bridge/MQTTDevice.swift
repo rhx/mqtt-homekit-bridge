@@ -20,3 +20,21 @@ struct MQTTDevice: Decodable {
     let topic: [MQTTAction : MQTTTopic]
 //    let payload: [MQTTAction : String]
 }
+
+extension MQTTDevice {
+    /// Return the MQTT status topic to subscribe to for the given characteristic
+    ///
+    /// - Parameter characteristic: device characteristic in question
+    /// - Returns: the status topic configured or `nil` if unconfigured
+    func statusTopic(for characteristic: String) -> String? {
+        return topic["status\(characteristic)"]
+    }
+
+    /// Return the MQTT control topic to post to for the given characteristic
+    ///
+    /// - Parameter characteristic: device characteristic in question
+    /// - Returns: the control topic configured or `nil` if unconfigured
+    func controlTopic(for characteristic: String) -> String? {
+        return topic["set\(characteristic)"]
+    }
+}

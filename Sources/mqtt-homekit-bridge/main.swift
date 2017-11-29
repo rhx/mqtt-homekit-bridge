@@ -114,5 +114,13 @@ let (accessories, accessoryIndexes) = devices.enumerated().reduce(([Accessory]()
         print("\(entry): ignoring unknown service \(mqttDevice.service) for \(mqttDevice.name ?? "<unnamed device>")")
         return $0
     }
+    accessory.onControlValueChange(for: mqttDevice) {
+        guard let topic = $0, let value = $1 else { return }
+        do {
+            _ = try mosquitto.publish(topic: topic, payload: value)
+        } catch {
+            print("Error \(error) attempting to publish \(topic): '\(value)'")
+        }
+    }
     return ($0.0 + [accessory], $0.1 + [index])
 }
