@@ -113,4 +113,31 @@ extension Accessory {
         }
         return true
     }
+
+    @discardableResult
+    func update(value: String) -> Bool {
+        switch self {
+        case let (acc as AirQualitySensor): acc.airQualitySensor.airQuality.value = Int(value).flatMap { AirQuality(rawValue: $0) }
+        case let (acc as BatteryService): acc.batteryService.batteryLevel.value = Int(value)
+        case let (acc as BridgeConfiguration): acc.bridgeConfiguration.configureBridgedAccessoryStatus.value = value.data(using: .utf8)
+        case let (acc as BridgingState): acc.bridgingState.linkQuality.value = Int(value)
+        case let (acc as Door): acc.door.currentPosition.value = Int(value)
+        case let (acc as Fan): acc.fan.on.value = value != "0"
+        case let (acc as GarageDoorOpener): acc.garageDoorOpener.currentDoorState.value = Int(value).flatMap { CurrentDoorState(rawValue: $0) }
+        case let (acc as Hygrometer): acc.humiditySensor.currentRelativeHumidity.value = Double(value)
+        case let (acc as Lightbulb): acc.lightbulb.on.value = value != "0"
+        case let (acc as LightSensor): acc.lightSensor.currentLight.value = Double(value)
+        case let (acc as LockMechanism): acc.lockMechanism.lockCurrentState.value = Int(value).flatMap { LockCurrentState(rawValue: $0) }
+        case let (acc as Outlet): acc.outlet.on.value = value != "0"
+        case let (acc as SecuritySystem): acc.securitySystem.securitySystemCurrentState.value = Int(value).flatMap { SecuritySystemCurrentState(rawValue: $0) }
+        case let (acc as SmokeSensor): acc.smokeSensor.smokeDetected.value = Int(value).flatMap { SmokeDetected(rawValue: $0) }
+        case let (acc as Switch): acc.`switch`.on.value = value != "0"
+        case let (acc as Thermometer): acc.temperatureSensor.currentTemperature.value = Double(value)
+        case let (acc as Thermostat): acc.thermostat.currentTemperature.value = Double(value)
+        case let (acc as Window): acc.window.currentPosition.value = Int(value)
+        case let (acc as WindowCovering): acc.windowCovering.currentPosition.value = Int(value)
+        default: return false
+        }
+        return true
+    }
 }

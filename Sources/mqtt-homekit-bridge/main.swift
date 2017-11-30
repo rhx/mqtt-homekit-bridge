@@ -106,9 +106,8 @@ do {
 }
 RunLoop.main.run(until: Date(timeIntervalSinceNow: dbExists ? 1 : 5))
 
-let (accessories, accessoryIndexes) = devices.enumerated().reduce(([Accessory](), [Int]())) {
-    let (index, dev) = $1
-    let (entry, mqttDevice) = dev
+let (accessories, accessoryIDs) = devices.reduce(([Accessory](), [String]())) {
+    let (entry, mqttDevice) = $1
     let deviceName = mqttDevice.name ?? entry
     let deviceInfo = Service.Info(name: deviceName, manufacturer: mqttDevice.manufacturer ?? vendor, model: mqttDevice.model ?? type, serialNumber: mqttDevice.serial ?? entry)
     guard let accessory = mqtt2hap(mqttDevice, info: deviceInfo) else {
@@ -118,13 +117,24 @@ let (accessories, accessoryIndexes) = devices.enumerated().reduce(([Accessory]()
     accessory.onControlValueChange(for: mqttDevice) {
         guard let topic = $0, let value = $1 else { return }
         do {
+            if verbosity > 2 { print("Publishing '\(topic)': '\(value)'") }
             _ = try mosquitto.publish(topic: topic, payload: value)
         } catch {
             print("Error \(error) attempting to publish \(topic): '\(value)'")
         }
     }
-    return ($0.0 + [accessory], $0.1 + [index])
+    return ($0.0 + [accessory], $0.1 + [entry])
 }
+var mqttSubscriptions = [String:(String) -> Void]()
+mosquitto.messageCallback = { msg in
+    guard let subscriptionCallback = mqttSubscriptions[msg.topic] else { return }
+    let content = msg.content
+    guard !content.isEmpty else { return }
+    DispatchQueue.main.async {
+        subscriptionCallback(content)
+    }
+}
+
 let info = Service.Info(name: name, manufacturer: vendor, model: type, serialNumber: serial, firmwareRevision: version)
 let device = Device(bridgeInfo: info, setupCode: pin, storage: db, accessories: accessories)
 
@@ -133,8 +143,44 @@ server.start()
 
 try! mosquitto.loopStart()
 
+for (i, accessory) in accessories.enumerated() {
+    let id = accessoryIDs[i]
+    guard let mqttDevice = devices[id],
+          let topic = accessory.valueCharacteristic.flatMap({ mqttDevice.statusTopic(for: $0) }) else {
+        continue
+    }
+    if verbosity > 0 { print("Subscribing to '\(topic)' for '\(id)'") }
+    mqttSubscriptions[topic] = {
+        if !accessory.update(value: $0) {
+            print("Cannot update '\(topic)' to '$0' for '\(id)'")
+        }
+    }
+    do {
+        _ = try mosquitto.subscribe(to: topic)
+    } catch {
+        print("Error \(error) attempting to subscribe to \(topic) for '\(id)'")
+    }
+}
+
 while active {
     RunLoop.current.run(until: Date().addingTimeInterval(2))
 }
+
+print("Unsubscribing ...")
+
+for (i, accessory) in accessories.enumerated() {
+    let id = accessoryIDs[i]
+    guard let mqttDevice = devices[id],
+        let topic = accessory.valueCharacteristic.flatMap({ mqttDevice.statusTopic(for: $0) }) else {
+            continue
+    }
+    do {
+        _ = try mosquitto.unsubscribe(from: topic)
+    } catch {
+        print("Error \(error) attempting to unsubscribe from \(topic) for '\(id)'")
+    }
+}
+
+RunLoop.current.run(until: Date().addingTimeInterval(2))
 
 try! mosquitto.loopStop()
