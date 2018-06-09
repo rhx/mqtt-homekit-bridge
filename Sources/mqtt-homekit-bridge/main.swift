@@ -5,7 +5,7 @@ import HAP
 
 let args = CommandLine.arguments
 let cmd = args[0]                   ///< command name
-var name = convert(cmd, using: basename)
+var name: String = convert(cmd, using: basename)
 var verbosity = 1                   ///< verbosity level
 var port = 1883                     ///< MQTT port
 var host = "192.168.1.3"            ///< Controller host
@@ -97,19 +97,14 @@ do {
 
 let dbPath = try! fm.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true).appendingPathComponent(name).path
 let dbExists = fm.fileExists(atPath: dbPath)
-let db: FileStorage
-do {
-    db = try FileStorage(path: dbPath)
-} catch {
-    fputs("Cannot open file storage at \(dbPath)\n", stderr)
-    exit(EXIT_FAILURE)
-}
+let db = FileStorage(filename: dbPath)
+
 RunLoop.main.run(until: Date(timeIntervalSinceNow: dbExists ? 1 : 5))
 
 let (accessories, accessoryIDs) = devices.reduce(([Accessory](), [String]())) {
     let (entry, mqttDevice) = $1
     let deviceName = mqttDevice.name ?? entry
-    let deviceInfo = Service.Info(name: deviceName, manufacturer: mqttDevice.manufacturer ?? vendor, model: mqttDevice.model ?? type, serialNumber: mqttDevice.serial ?? entry)
+    let deviceInfo = Service.Info(name: deviceName, serialNumber: mqttDevice.serial ?? entry, manufacturer: mqttDevice.manufacturer ?? vendor, model: mqttDevice.model ?? type)
     guard let accessory = mqtt2hap(mqttDevice, info: deviceInfo) else {
         print("\(entry): ignoring unknown service \(mqttDevice.service) for \(mqttDevice.name ?? "<unnamed device>")")
         return $0
@@ -135,8 +130,9 @@ mosquitto.messageCallback = { msg in
     }
 }
 
-let info = Service.Info(name: name, manufacturer: vendor, model: type, serialNumber: serial, firmwareRevision: version)
-let device = Device(bridgeInfo: info, setupCode: pin, storage: db, accessories: accessories)
+let info = Service.Info(name: name, serialNumber: serial, manufacturer: vendor, model: type, firmwareRevision: version)
+let device = Device(bridgeInfo: info, setupCode: Device.SetupCode(stringLiteral: pin), storage: db, accessories: accessories)
+device.delegate = HAPDeviceDelegate.shared
 
 let server = try Server(device: device, port: 0)
 server.start()

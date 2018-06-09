@@ -35,28 +35,28 @@ enum AccessoryType: String {
 func mqtt2hap(_ mqttDevice: MQTTDevice, info deviceInfo: Service.Info) -> Accessory? {
     guard let type = AccessoryType(rawValue: mqttDevice.service) else { return nil }
     switch type {
-    case .airQualitySensor: return .AirQualitySensor(info: deviceInfo)
-    case .batteryService: return .BatteryService(info: deviceInfo)
-    case .bridgeConfiguration: return .BridgeConfiguration(info: deviceInfo)
-    case .bridgingState: return .BridgingState(info: deviceInfo)
+    case .airQualitySensor: return Accessory.AirQualitySensor(info: deviceInfo)
+    case .batteryService: return Accessory.BatteryService(info: deviceInfo)
+    case .bridgeConfiguration: return Accessory.BridgeConfiguration(info: deviceInfo)
+    case .bridgingState: return Accessory.BridgingState(info: deviceInfo)
     case .contactSensor: fallthrough
-    case .door: return .Door(info: deviceInfo)
-    case .fan: return .Fan(info: deviceInfo)
-    case .garageDoorOpener: return .GarageDoorOpener(info: deviceInfo)
-    case .humiditySensor: return .Hygrometer(info: deviceInfo)
-    case .lightbulb: return .Lightbulb(info: deviceInfo)
-    case .lightSensor: return .LightSensor(info: deviceInfo)
-    case .lockMechanism: return .LockMechanism(info: deviceInfo)
-    case .outlet: return .Outlet(info: deviceInfo)
-    case .securitySystem: return .SecuritySystem(info: deviceInfo)
+    case .door: return Accessory.Door(info: deviceInfo)
+    case .fan: return Accessory.Fan(info: deviceInfo)
+    case .garageDoorOpener: return Accessory.GarageDoorOpener(info: deviceInfo)
+    case .humiditySensor: return Accessory.Hygrometer(info: deviceInfo)
+    case .lightbulb: return Accessory.Lightbulb(info: deviceInfo)
+    case .lightSensor: return Accessory.LightSensor(info: deviceInfo)
+    case .lockMechanism: return Accessory.LockMechanism(info: deviceInfo)
+    case .outlet: return Accessory.Outlet(info: deviceInfo)
+    case .securitySystem: return Accessory.SecuritySystem(info: deviceInfo)
     case .smokeDetector: fallthrough
-    case .smokeSensor: return .SmokeSensor(info: deviceInfo)
-    case .switch: return .Switch(info: deviceInfo)
+    case .smokeSensor: return Accessory.SmokeSensor(info: deviceInfo)
+    case .switch: return Accessory.Switch(info: deviceInfo)
     case .temperatureSensor: fallthrough
-    case .thermometer: return .Thermometer(info: deviceInfo)
-    case .thermostat: return .Thermostat(info: deviceInfo)
-    case .window: return .Window(info: deviceInfo)
-    case .windowCovering: return .WindowCovering(info: deviceInfo)
+    case .thermometer: return Accessory.Thermometer(info: deviceInfo)
+    case .thermostat: return Accessory.Thermostat(info: deviceInfo)
+    case .window: return Accessory.Window(info: deviceInfo)
+    case .windowCovering: return Accessory.WindowCovering(info: deviceInfo)
     }
 }
 
@@ -89,26 +89,27 @@ extension Accessory {
     @discardableResult
     func onControlValueChange(for mqttDevice: MQTTDevice, call: @escaping (String?, String?) -> Void) -> Bool {
         let topic = valueCharacteristic.flatMap { mqttDevice.controlTopic(for: $0) }
+        let delegate = HAPDeviceDelegate.shared
         switch self {
-        case let (acc as AirQualitySensor): acc.airQualitySensor.airQuality.onValueChange.append { call(topic, $0.map { "\($0)" }) }
-        case let (acc as BatteryService): acc.batteryService.batteryLevel.onValueChange.append { call(topic, $0.map { "\($0)" }) }
-        case let (acc as BridgeConfiguration): acc.bridgeConfiguration.configureBridgedAccessoryStatus.onValueChange.append { call(topic, $0.map { "\($0)" }) }
-        case let (acc as BridgingState): acc.bridgingState.linkQuality.onValueChange.append { call(topic, $0.map { "\($0)" }) }
-        case let (acc as Door): acc.door.currentPosition.onValueChange.append { call(topic, $0.map { "\($0)" }) }
-        case let (acc as Fan): acc.fan.on.onValueChange.append { call(topic, $0.map { "\($0 ? 1 : 0)" }) }
-        case let (acc as GarageDoorOpener): acc.garageDoorOpener.currentDoorState.onValueChange.append { call(topic, $0.map { "\($0)" }) }
-        case let (acc as Hygrometer): acc.humiditySensor.currentRelativeHumidity.onValueChange.append { call(topic, $0.map { "\($0)" }) }
-        case let (acc as Lightbulb): acc.lightbulb.on.onValueChange.append { call(topic, $0.map { "\($0 ? 1 : 0)" }) }
-        case let (acc as LightSensor): acc.lightSensor.currentLight.onValueChange.append { call(topic, $0.map { "\($0)" }) }
-        case let (acc as LockMechanism): acc.lockMechanism.lockCurrentState.onValueChange.append { call(topic, $0.map { "\($0)" }) }
-        case let (acc as Outlet): acc.outlet.on.onValueChange.append { call(topic, $0.map { "\($0 ? 1 : 0)" }) }
-        case let (acc as SecuritySystem): acc.securitySystem.securitySystemCurrentState.onValueChange.append { call(topic, $0.map { "\($0)" }) }
-        case let (acc as SmokeSensor): acc.smokeSensor.smokeDetected.onValueChange.append { call(topic, $0.map { "\($0)" }) }
-        case let (acc as Switch): acc.`switch`.on.onValueChange.append { call(topic, $0.map { "\($0 ? 1 : 0)" }) }
-        case let (acc as Thermometer): acc.temperatureSensor.currentTemperature.onValueChange.append { call(topic, $0.map { "\($0)" }) }
-        case let (acc as Thermostat): acc.thermostat.currentTemperature.onValueChange.append { call(topic, $0.map { "\($0)" }) }
-        case let (acc as Window): acc.window.currentPosition.onValueChange.append { call(topic, $0.map { "\($0)" }) }
-        case let (acc as WindowCovering): acc.windowCovering.currentPosition.onValueChange.append { call(topic, $0.map { "\($0)" }) }
+        case let (acc as AirQualitySensor): delegate.onIntChange.append { if $0 === acc { call(topic, $1.map { "\($0)" }) } }
+        case let (acc as BatteryService): delegate.onIntChange.append { if $0 === acc { call(topic, $1.map { "\($0)" }) } }
+        case let (acc as BridgeConfiguration): delegate.onDataChange.append { if $0 === acc { call(topic, $1.map { "\($0)" }) } }
+        case let (acc as BridgingState): delegate.onIntChange.append { if $0 === acc { call(topic, $1.map { "\($0)" }) } }
+        case let (acc as Door): delegate.onIntChange.append { if $0 === acc { call(topic, $1.map { "\($0)" }) } }
+        case let (acc as Fan): delegate.onBoolChange.append { if $0 === acc { call(topic, $1.map { "\($0 ? 1 : 0)" }) } }
+        case let (acc as GarageDoorOpener): delegate.onCurrentDoorStateChange.append { if $0 === acc { call(topic, $1.map { "\($0)" }) } }
+        case let (acc as Hygrometer): delegate.onDoubleChange.append { if $0 === acc { call(topic, $1.map { "\($0)" }) } }
+        case let (acc as Lightbulb): delegate.onBoolChange.append { if $0 === acc { call(topic, $1.map { "\($0 ? 1 : 0)" }) } }
+        case let (acc as LightSensor): delegate.onDoubleChange.append { if $0 === acc { call(topic, $1.map { "\($0)" }) } }
+        case let (acc as LockMechanism): delegate.onLockCurrentStateChange.append { if $0 === acc { call(topic, $1.map { "\($0)" }) } }
+        case let (acc as Outlet): delegate.onBoolChange.append { if $0 === acc { call(topic, $1.map { "\($0 ? 1 : 0)" }) } }
+        case let (acc as SecuritySystem): delegate.onSecuritySystemCurrentStateChange.append { if $0 === acc { call(topic, $1.map { "\($0)" }) } }
+        case let (acc as SmokeSensor): delegate.onSmokeDetectedChange.append { if $0 === acc { call(topic, $1.map { "\($0)" }) } }
+        case let (acc as Switch): delegate.onBoolChange.append { if $0 === acc { call(topic, $1.map { "\($0 ? 1 : 0)" }) } }
+        case let (acc as Thermometer): delegate.onDoubleChange.append { if $0 === acc { call(topic, $1.map { "\($0)" }) } }
+        case let (acc as Thermostat): delegate.onDoubleChange.append { if $0 === acc { call(topic, $1.map { "\($0)" }) } }
+        case let (acc as Window): delegate.onIntChange.append { if $0 === acc { call(topic, $1.map { "\($0)" }) } }
+        case let (acc as WindowCovering): delegate.onIntChange.append { if $0 === acc { call(topic, $1.map { "\($0)" }) } }
         default: return false
         }
         return true
@@ -141,3 +142,4 @@ extension Accessory {
         return true
     }
 }
+
