@@ -24,7 +24,7 @@ To build using Xcode, use
 ```
 brew install mosquitto
 swift package generate-xcodeproj --xcconfig-overrides Package.xcconfig
-open Mosquitto.xcodeproj
+open mqtt-homekit-bridge.xcodeproj
 ```
 
 ## TODO
