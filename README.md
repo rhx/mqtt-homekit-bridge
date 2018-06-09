@@ -22,7 +22,7 @@ swift build -c release -Xcc -I/usr/local/include -Xlinker -L/usr/local/lib
 To build using Xcode, use
 
 ```
-brew install mosquitto
+brew install libsodium mosquitto
 swift package generate-xcodeproj --xcconfig-overrides Package.xcconfig
 open mqtt-homekit-bridge.xcodeproj
 ```
