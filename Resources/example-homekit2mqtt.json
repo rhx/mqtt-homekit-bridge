@@ -1,0 +1,215 @@
+{
+  "livingroom/lights": {
+    "id": "livingroom/lights",
+    "name": "Main Lights",
+    "service": "Lightbulb",
+    "manufacturer": "Sonoff",
+    "model": "basic",
+    "serial": "12345",
+    "topic": {
+      "setOn": "/livingroom/lights/lights/relay/0/set",
+      "statusOn": "/livingroom/lights/lights/relay/0",
+      "statusBrightness": "/livingroom/lights/lights/relay/0",
+      "identify": "/livingroom/lights/lights/relay/0"
+    },
+    "payload": {
+      "onTrue": 1,
+      "onFalse": 0,
+      "brightnessFactor": 255,
+      "hueFactor": "",
+      "saturationFactor": "",
+      "identify": "1"
+    },
+    "config": {}
+  },
+  "backdoor/lights": {
+    "id": "backdoor/lights",
+    "name": "Backdoor Lights",
+    "service": "Lightbulb",
+    "manufacturer": "Sonoff",
+    "model": "dual",
+    "serial": "123456",
+    "topic": {
+      "setOn": "/backdoor/switch/backdoorlights/relay/0/set",
+      "statusOn": "/backdoor/switch/backdoorlights/relay/0",
+      "statusBrightness": "/backdoor/switch/backdoorlights/relay/0",
+      "identify": "/backdoor/switch/backdoorlights/relay/0"
+    },
+    "payload": {
+      "onTrue": 1,
+      "onFalse": 0,
+      "brightnessFactor": 255,
+      "hueFactor": "",
+      "saturationFactor": "",
+      "identify": "1"
+    },
+    "config": {}
+  },
+  "garage/lights": {
+    "id": "garage/lights",
+    "name": "Garage Lights",
+    "service": "Lightbulb",
+    "manufacturer": "Sonoff",
+    "model": "dual",
+    "serial": "1234567",
+    "topic": {
+      "setOn": "/backdoor/switch/backdoorlights/relay/1/set",
+      "statusOn": "/backdoor/switch/backdoorlights/relay/1",
+      "statusBrightness": "/backdoor/switch/backdoorlights/relay/1",
+      "identify": "/backdoor/switch/backdoorlights/relay/1"
+    },
+    "payload": {
+      "onTrue": 1,
+      "onFalse": 0,
+      "brightnessFactor": 255,
+      "hueFactor": "",
+      "saturationFactor": "",
+      "identify": "1"
+    },
+    "config": {}
+  },
+  "study/lights": {
+    "id": "study/lights",
+    "name": "Study Lights",
+    "service": "Lightbulb",
+    "manufacturer": "Sonoff",
+    "model": "basic",
+    "serial": "12345678",
+    "topic": {
+      "setOn": "/study/lights/studylights/relay/0/set",
+      "statusOn": "/study/lights/studylights/relay/0",
+      "statusBrightness": "/study/lights/studylights/relay/0",
+      "identify": "/study/lights/studylights/relay/0"
+    },
+    "payload": {
+      "onTrue": 1,
+      "onFalse": 0,
+      "brightnessFactor": 255,
+      "hueFactor": "",
+      "saturationFactor": "",
+      "identify": "1"
+    },
+    "config": {}
+  },
+  "kitchen/barlights": {
+    "id": "kitchen/barlights",
+    "name": "Bar Lights",
+    "service": "Lightbulb",
+    "manufacturer": "Sonoff",
+    "model": "basic",
+    "serial": "123456789",
+    "topic": {
+      "setOn": "/kitchen/switch/barlights/relay/0/set",
+      "statusOn": "/kitchen/switch/barlights/relay/0",
+      "statusBrightness": "/kitchen/switch/barlights/relay/0",
+      "identify": "/kitchen/switch/barlights/relay/0"
+    },
+    "payload": {
+      "onTrue": 1,
+      "onFalse": 0,
+      "brightnessFactor": 255,
+      "hueFactor": "",
+      "saturationFactor": "",
+      "identify": "1"
+    },
+    "config": {}
+  },
+  "corridor/lights": {
+    "id": "corridor/lights",
+    "name": "Corridor Lights",
+    "service": "Lightbulb",
+    "manufacturer": "Sonoff",
+    "model": "basic",
+    "serial": "23456789",
+    "topic": {
+      "setOn": "/corridor/lights/corridorlights/relay/0/set",
+      "statusOn": "/corridor/lights/corridorlights/relay/0",
+      "statusBrightness": "/corridor/lights/corridorlights/relay/0",
+      "identify": "/corridor/switch/corridorlights/relay/0"
+    },
+    "payload": {
+      "onTrue": 1,
+      "onFalse": 0,
+      "brightnessFactor": 255,
+      "hueFactor": "",
+      "saturationFactor": "",
+      "identify": "1"
+    },
+    "config": {}
+  },
+  "bedroom/lights": {
+    "id": "bedroom/lights",
+    "name": "Bedroom 2 Lights",
+    "service": "Lightbulb",
+    "manufacturer": "Sonoff",
+    "model": "basic",
+    "serial": "3456789",
+    "topic": {
+      "setOn": "/bedroom/switch/bedroomlights/relay/0/set",
+      "statusOn": "/bedroom/switch/bedroomlights/relay/0",
+      "statusBrightness": "/bedroom/switch/bedroomlights/relay/0",
+      "identify": "/bedroom/switch/bedroomlights/relay/0"
+    },
+    "payload": {
+      "onTrue": 1,
+      "onFalse": 0,
+      "brightnessFactor": 255,
+      "hueFactor": "",
+      "saturationFactor": "",
+      "identify": "1"
+    },
+    "config": {}
+  },
+  "bedroom/temperature": {
+    "id": "bedroom/temperature",
+    "name": "Bedroom 2 Temperature",
+    "service": "TemperatureSensor",
+    "manufacturer": "Sonoff",
+    "model": "AM2301",
+    "serial": "56789",
+    "topic": {
+      "statusTemperature": "/bedroom/switch/bedroomlights/temperature",
+      "statusLowBattery": "/bedroom/switch/bedroomlights/rssi",
+      "identify": "/bedroom/switch/bedroomlights/relay/0/set"
+    },
+    "payload": {
+      "fahrenheit": false,
+      "onLowBattery": -80,
+      "identify": 1
+    },
+    "config": {}
+  },
+  "bedroom/humidity": {
+    "id": "bedroom/humidity",
+    "name": "Bedroom 2 Humidity",
+    "service": "HumiditySensor",
+    "manufacturer": "Sonoff",
+    "model": "AM2301",
+    "serial": "789",
+    "topic": {
+      "statusHumidity": "/bedroom/switch/bedroomlights/humidity",
+      "statusLowBattery": "/bedroom/switch/bedroomlights/rssi",
+      "identify": "/bedroom/switch/bedroomlights/relay/0/set"
+    },
+    "payload": {
+      "onLowBattery": -80,
+      "identify": 1
+    },
+    "config": {}
+  },
+  "entrance/door": {
+    "id": "entrance/door",
+    "name": "Entrance",
+    "service": "ContactSensor",
+    "manufacturer": "Raspberry Pi",
+    "model": "3",
+    "serial": "9",
+    "topic": {
+      "statusContactSensorState": "/rpi/gpio/7"
+    },
+    "payload": {
+      "onContactDetected": "0"
+    },
+    "config": {}
+  }
+}
