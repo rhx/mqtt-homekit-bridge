@@ -24,13 +24,18 @@ class HAPDeviceDelegate {
 }
 
 extension HAPDeviceDelegate: DeviceDelegate {
-    func characteristic(_ characteristic: GenericCharacteristic<Bool>, ofService: Service, ofAccessory a: Accessory, didChangeValue: Bool?) { onBoolChange.forEach { $0(a, didChangeValue) } }
-    func characteristic(_ characteristic: GenericCharacteristic<Int>, ofService: Service, ofAccessory a: Accessory, didChangeValue: Int?) { onIntChange.forEach { $0(a, didChangeValue) } }
-    func characteristic(_ characteristic: GenericCharacteristic<Double>, ofService: Service, ofAccessory a: Accessory, didChangeValue: Double?) { onDoubleChange.forEach { $0(a, didChangeValue) } }
-    func characteristic(_ characteristic: GenericCharacteristic<Data>, ofService: Service, ofAccessory a: Accessory, didChangeValue: Data?) { onDataChange.forEach { $0(a, didChangeValue) } }
-
-    func characteristic(_ characteristic: GenericCharacteristic<CurrentDoorState>, ofService: Service, ofAccessory a: Accessory, didChangeValue: CurrentDoorState?) { onCurrentDoorStateChange.forEach { $0(a, didChangeValue) } }
-    func characteristic(_ characteristic: GenericCharacteristic<LockCurrentState>, ofService: Service, ofAccessory a: Accessory, didChangeValue: LockCurrentState?) { onLockCurrentStateChange.forEach { $0(a, didChangeValue) } }
-    func characteristic(_ characteristic: GenericCharacteristic<SecuritySystemCurrentState>, ofService: Service, ofAccessory a: Accessory, didChangeValue: SecuritySystemCurrentState?) { onSecuritySystemCurrentStateChange.forEach { $0(a, didChangeValue) } }
-    func characteristic(_ characteristic: GenericCharacteristic<SmokeDetected>, ofService: Service, ofAccessory a: Accessory, didChangeValue: SmokeDetected?) { onSmokeDetectedChange.forEach { $0(a, didChangeValue) } }
+    func characteristic<T>(_ characteristic: GenericCharacteristic<T>, ofService service: Service, ofAccessory a: Accessory, didChangeValue newValue: T?) {
+        print(" --> Characteristic \(characteristic) of service \(service.type) of accessory \(a.info.name.value ?? name) changed to: \(String(describing: newValue))")
+        switch newValue {
+        case let value as Bool?:   onBoolChange.forEach   { $0(a, value) }
+        case let value as Int?:    onIntChange.forEach    { $0(a, value) }
+        case let value as Double?: onDoubleChange.forEach { $0(a, value) }
+        case let value as Data?:   onDataChange.forEach   { $0(a, value) }
+        case let value as CurrentDoorState?:           onCurrentDoorStateChange.forEach           { $0(a, value) }
+        case let value as LockCurrentState?:           onLockCurrentStateChange.forEach           { $0(a, value) }
+        case let value as SecuritySystemCurrentState?: onSecuritySystemCurrentStateChange.forEach { $0(a, value) }
+        case let value as SmokeDetected?:              onSmokeDetectedChange.forEach              { $0(a, value) }
+        default: print("Unknown value")
+        }
+    }
 }
